@@ -11,29 +11,89 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages).
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Простая библиотека для внедрения базового функционала WebSocket в ваше Flutter приложение
 
-## Features
+## Подключение
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+Подключите библиотеку добавив код в `pubspec.yaml` в раздел `dependencies`
 
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
+```yaml
+rockus_socket:
+    git:
+        url: https://github.com/rockus-games/rockus_socket.git
+        ref: master
 ```
 
-## Additional information
+В результате должно получиться так:
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```yaml
+dependencies:
+    flutter:
+        sdk: "flutter"
+
+    rockus_socket:
+        git:
+            url: https://github.com/rockus-games/rockus_socket.git
+            ref: master
+
+    # остальные ваши библиотеки и плагины
+```
+
+## Использование
+
+Создайте объект класса `RSocket`
+
+Используйте функцию `on` для чтения входящего события
+
+```dart
+RSocket socket = new RSocket({
+    ip: "127.0.0.1:8080" // IP вашего сервера
+})
+
+void someEvent(Event event) {
+    // Аргумент event имеет тип Event и содержит поля type и data
+
+    print(event.type);
+    print(event.data);
+}
+
+socket.on("название_события", someEvent);
+```
+
+Используйте off, offAll, offLast чтобы отключить чтение данного события
+
+```dart
+RSocket socket = new RSocket({
+    ip: "127.0.0.1:8080" // IP вашего сервера
+})
+
+socket.off("название_события", someEvent);
+//off требует обязательного указания функции, которую надо отключить
+
+socket.offAll("название_события");
+//offAll отключает все чтения для указанного события
+
+socket.offLast("название_события");
+//offLast отключает функцию чтения, которая была добавлена последней
+```
+
+Для отправки сообщений используйте функцию `send`:
+
+```dart
+
+RSocket socket = new RSocket({
+    ip: "127.0.0.1:8080" // IP вашего сервера
+})
+
+socket.send(Event({
+    type: "название_события",
+    data: {
+        "ключ": "значение",
+        "ключ2": "значение2"
+    }
+    //ключ обязательно String
+    //значение может принимать любой тип
+}))
+```
+
+Также есть стандартные методы вроде `socket.connect`, `socket.disconnect`.
